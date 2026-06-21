@@ -1,3 +1,5 @@
+# All placeholder variables are rendered from .env into museum.rendered.yaml before docker compose up.
+
 db:
       host: ${MUSEUM_DB_HOST}
       port: ${MUSEUM_DB_PORT}
@@ -37,7 +39,7 @@ s3:
             region: eu-central-2
             bucket: scw-eu-fr-v3
 
-# Specify the base endpoints for various web apps
+# Public web app endpoints
 apps:
     # If you're running a self hosted instance and wish to serve public links,
     # set this to the URL where your albums web app is running.
