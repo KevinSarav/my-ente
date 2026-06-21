@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 6 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate Compose and YAML
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install YAML parser
+        run: pip install pyyaml
+
+      - name: Validate museum.yaml syntax
+        run: |
+          python - <<'PY'
+          import pathlib
+          import sys
+
+          try:
+              import yaml
+          except Exception:
+              raise SystemExit("PyYAML is not available in runner image")
+
+          p = pathlib.Path("museum.yaml")
+          yaml.safe_load(p.read_text(encoding="utf-8"))
+          print("museum.yaml parsed successfully")
+          PY
+
+      - name: Validate docker compose config
+        run: docker compose -f compose.yaml config --no-interpolate
+
+  secrets:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  security-scan:
+    name: Image Vulnerability Scan (scheduled/manual)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Trivy
+        uses: aquasecurity/setup-trivy@v0.2.2
+
+      - name: Scan Ente and base images
+        run: |
+          set -euo pipefail
+          trivy image --severity HIGH,CRITICAL --exit-code 1 ghcr.io/ente-io/server
+          trivy image --severity HIGH,CRITICAL --exit-code 1 ghcr.io/ente-io/web
+          trivy image --severity HIGH,CRITICAL --exit-code 1 postgres:15
+          trivy image --severity HIGH,CRITICAL --exit-code 1 minio/minio
