@@ -1,0 +1,74 @@
+db:
+      host: ${MUSEUM_DB_HOST}
+      port: ${MUSEUM_DB_PORT}
+      name: ${MUSEUM_DB_NAME}
+      user: ${MUSEUM_DB_USER}
+      password: ${MUSEUM_DB_PASSWORD}
+
+s3:
+      # Top-level configuration for buckets, you can override by specifying these configuration in the desired bucket.
+      # Set this to false if using external object storage bucket or bucket with SSL
+      are_local_buckets: true
+      # Set this to false if using subdomain-style URL. This is set to true for ensuring compatibility with MinIO when SSL is enabled.
+      use_path_style_urls: true
+      b2-eu-cen:
+         # Uncomment the below configuration to override the top-level configuration 
+         # are_local_buckets: true
+         # use_path_style_urls: true
+         key: ${S3_ACCESS_KEY}
+         secret: ${S3_SECRET_KEY}
+         endpoint: ${S3_ENDPOINT}
+         region: eu-central-2
+         bucket: b2-eu-cen
+      wasabi-eu-central-2-v3:
+         # are_local_buckets: true
+         # use_path_style_urls: true
+         key: ${S3_ACCESS_KEY}
+         secret: ${S3_SECRET_KEY}
+         endpoint: ${S3_ENDPOINT}
+         region: eu-central-2
+         bucket: wasabi-eu-central-2-v3
+         compliance: false
+      scw-eu-fr-v3:
+         # are_local_buckets: true
+         # use_path_style_urls: true
+         key: ${S3_ACCESS_KEY}
+         secret: ${S3_SECRET_KEY}
+         endpoint: ${S3_ENDPOINT}
+         region: eu-central-2
+         bucket: scw-eu-fr-v3
+
+# Specify the base endpoints for various web apps
+apps:
+    # If you're running a self hosted instance and wish to serve public links,
+    # set this to the URL where your albums web app is running.
+    public-albums: ${ENTE_PUBLIC_ALBUMS_URL}
+    cast: ${ENTE_CAST_URL}
+    # Public locker (share) app
+    public-locker: ${ENTE_PUBLIC_LOCKER_URL}
+    # Public paste app
+    public-paste: ${ENTE_PUBLIC_PASTE_URL}
+    # Embed app for embedded album sharing
+    embed-albums: ${ENTE_EMBED_ALBUMS_URL}
+    # Set this to the URL where your accounts web app is running, primarily used for
+    # passkey based 2FA.
+    accounts: ${ENTE_ACCOUNTS_URL}
+
+key:
+      encryption: ${MUSEUM_KEY_ENCRYPTION}
+      hash: ${MUSEUM_KEY_HASH}
+
+jwt:
+      secret: ${MUSEUM_JWT_SECRET}
+
+smtp:
+  host: ${SMTP_HOST}
+  port: ${SMTP_PORT}
+  username: ${SMTP_USERNAME}
+  password: ${SMTP_PASSWORD}
+  email: ${SMTP_EMAIL}
+
+webauthn:
+  rpid: ${WEBAUTHN_RPID}
+  rporigins:
+    - "${WEBAUTHN_RPORIGIN}"
