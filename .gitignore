@@ -2,3 +2,4 @@
 .env.*
 !.env.example
 museum.rendered.yaml
+env_backups/
