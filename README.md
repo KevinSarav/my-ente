@@ -34,3 +34,10 @@ Requires `make` to be installed.
 ./scripts/render-museum-config.sh
 docker compose up -d
 ```
+
+5. To update published images before recreating containers:
+
+```bash
+docker compose pull
+make up
+```
