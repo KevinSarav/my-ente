@@ -41,3 +41,39 @@ docker compose up -d
 docker compose pull
 make up
 ```
+
+## GitHub Actions Deployment
+
+Workflow: `.github/workflows/deploy-ente.yml`
+
+Triggers:
+- Push to `main`
+- Manual run (`workflow_dispatch`)
+
+Required GitHub secrets (repo-level or Environment `production`):
+- `DEPLOY_USER`
+- `DEPLOY_HOST`
+- `DEPLOY_PATH`
+- `DEPLOY_SSH_PRIVATE_KEY`
+
+Optional GitHub secret:
+- `DEPLOY_PORT` (defaults to `22`)
+
+Server requirements for encrypted env deploys:
+- `sops` must be installed on the server.
+- The server must have an Age private key matching one of the public recipients listed in `.sops.yaml`.
+
+## Encrypt `.env` to `.env.sops` (Manual)
+
+Use SOPS locally whenever `.env` changes:
+
+```bash
+sops --encrypt --input-type dotenv --output-type dotenv .env > .env.sops
+chmod 600 .env.sops
+```
+
+If you rotate or add Age keys, update recipients in `.sops.yaml` under `creation_rules[].age`, then re-encrypt:
+
+```bash
+sops updatekeys .env.sops
+```
