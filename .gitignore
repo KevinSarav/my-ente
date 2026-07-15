@@ -3,4 +3,5 @@
 !.env.example
 !.env.sops
 !.env.*.sops
+.githooks/
 museum.rendered.yaml
