@@ -5,6 +5,13 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      museum_image:
+        description: "Override museum image for rollback (e.g. ghcr.io/kevinsarav/ente-server-mirror:2026-07). Leave blank to pull upstream latest."
+        required: false
+        default: ""
+  schedule:
+    - cron: "0 11 * * 0" # Weekly, Sunday 05:00 CST (UTC-6)
 
 permissions:
   contents: read
@@ -61,6 +68,25 @@ jobs:
         shell: bash
         env:
           DEPLOY_BRANCH: ${{ github.ref_name }}
+          MUSEUM_IMAGE_OVERRIDE: ${{ inputs.museum_image }}
         run: |
           set -euo pipefail
-          ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "DEPLOY_PATH='$DEPLOY_PATH' DEPLOY_BRANCH='$DEPLOY_BRANCH' bash '$DEPLOY_PATH/scripts/deploy-remote.sh'"
+          ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" \
+            "DEPLOY_PATH='$DEPLOY_PATH' DEPLOY_BRANCH='$DEPLOY_BRANCH' MUSEUM_IMAGE_OVERRIDE='$MUSEUM_IMAGE_OVERRIDE' bash '$DEPLOY_PATH/scripts/deploy-remote.sh'"
+
+      - name: Verify Ente is healthy
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Polling Ente health endpoint (up to 2 minutes)..."
+          for i in {1..12}; do
+            if ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" \
+              "wget -qO- http://localhost:8080/ping 2>/dev/null | grep -q 'pong'"; then
+              echo "Ente is healthy."
+              exit 0
+            fi
+            echo "Attempt $i/12 — not yet healthy, retrying in 10s..."
+            sleep 10
+          done
+          echo "::error title=Health check failed::Ente did not become healthy within 2 minutes after deploy."
+          exit 1

@@ -48,6 +48,13 @@ fi
 sh ./scripts/render-museum-config.sh museum.yaml museum.rendered.yaml
 
 docker compose pull
+# If a mirror image override was requested, retag it so compose uses it in place of upstream.
+if [[ -n "${MUSEUM_IMAGE_OVERRIDE:-}" ]]; then
+  echo "Image override requested: pulling $MUSEUM_IMAGE_OVERRIDE"
+  docker pull "$MUSEUM_IMAGE_OVERRIDE"
+  docker tag "$MUSEUM_IMAGE_OVERRIDE" ghcr.io/ente/server:latest
+  echo "Retagged as ghcr.io/ente/server:latest — compose will use this image."
+fi
 docker compose up -d --remove-orphans
 
 # Keep rendered config ephemeral, similar to local Makefile behavior.
