@@ -36,6 +36,14 @@ jobs:
             docker://ghcr.io/ente/server:latest \
             docker://ghcr.io/${{ steps.tag.outputs.owner }}/ente-server-mirror:${{ steps.tag.outputs.tag }}
 
+      - name: Set package visibility to public
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api --method PATCH \
+            "/user/packages/container/ente-server-mirror" \
+            --field visibility=public
+
       - name: Prune old versions (keep newest 3)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
