@@ -10,6 +10,10 @@ on:
         description: "ente museum image optional override"
         required: false
         default: ""
+      web_image:
+        description: "ente web image optional override"
+        required: false
+        default: ""
   schedule:
     - cron: "0 11 * * 0" # Weekly, Sunday 05:00 CST (UTC-6)
 
@@ -69,10 +73,11 @@ jobs:
         env:
           DEPLOY_BRANCH: ${{ github.ref_name }}
           MUSEUM_IMAGE_OVERRIDE: ${{ inputs.museum_image }}
+          WEB_IMAGE_OVERRIDE: ${{ inputs.web_image }}
         run: |
           set -euo pipefail
           ssh -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" \
-            "DEPLOY_PATH='$DEPLOY_PATH' DEPLOY_BRANCH='$DEPLOY_BRANCH' MUSEUM_IMAGE_OVERRIDE='$MUSEUM_IMAGE_OVERRIDE' bash '$DEPLOY_PATH/scripts/deploy-remote.sh'"
+            "DEPLOY_PATH='$DEPLOY_PATH' DEPLOY_BRANCH='$DEPLOY_BRANCH' MUSEUM_IMAGE_OVERRIDE='$MUSEUM_IMAGE_OVERRIDE' WEB_IMAGE_OVERRIDE='$WEB_IMAGE_OVERRIDE' bash '$DEPLOY_PATH/scripts/deploy-remote.sh'"
 
       - name: Verify Ente is healthy
         shell: bash
