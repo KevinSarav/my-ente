@@ -48,7 +48,6 @@ fi
 sh ./scripts/render-museum-config.sh museum.yaml museum.rendered.yaml
 
 docker compose pull
-# If a mirror image override was requested, retag it so compose uses it in place of upstream.
 if [[ -n "${MUSEUM_IMAGE_OVERRIDE:-}" ]]; then
   echo "Museum image override requested: pulling $MUSEUM_IMAGE_OVERRIDE"
   docker pull "$MUSEUM_IMAGE_OVERRIDE"
