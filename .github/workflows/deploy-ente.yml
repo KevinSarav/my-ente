@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       museum_image:
-        description: "Override museum image for rollback (e.g. ghcr.io/kevinsarav/ente-server-mirror:2026-07). Leave blank to pull upstream latest."
+        description: "ente museum image optional override"
         required: false
         default: ""
   schedule:
